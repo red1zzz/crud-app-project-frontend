@@ -1,15 +1,39 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import ItemList from './components/ItemList';
+import ItemForm from './components/ItemForm';
 import ItemDetail from './components/ItemDetail';
+import Login from './components/Login';
+import Register from './components/Register';
+import Navbar from './components/Navbar';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   return (
     <Router>
-      <div className="App">
+      <div>
+        <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
         <Routes>
-          <Route path="/" element={<div>Welcome to the App</div>} />
-          <Route path="/items/:id" element={<ItemDetail />} />
-          <Route path="*" element={<div>Page not found</div>} />
+          <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+          <Route path="/register" element={<Register />} />
+          <Route 
+            path="/items" 
+            element={isLoggedIn ? <ItemList /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/items/new" 
+            element={isLoggedIn ? <ItemForm /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/items/:id" 
+            element={isLoggedIn ? <ItemDetail /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/items/:id/edit" 
+            element={isLoggedIn ? <ItemForm /> : <Navigate to="/login" />} 
+          />
+          <Route path="/" element={<Navigate to="/items" />} />
         </Routes>
       </div>
     </Router>

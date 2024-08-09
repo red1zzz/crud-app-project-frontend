@@ -1,38 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { getItem, deleteItem } from '../services/api';
+import { useParams, Link } from 'react-router-dom';
 
 function ItemDetail() {
   const [item, setItem] = useState(null);
   const { id } = useParams();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(`Component mounted, fetching item with id: ${id}`);
-    fetchItem();
+    fetch(`http://localhost:5000/items/${id}`)
+      .then(response => response.json())
+      .then(data => {
+        console.log('Fetched item:', data);
+        setItem(data);
+      })
+      .catch(error => console.log('Error fetching item:', error));
   }, [id]);
-
-  const fetchItem = async () => {
-    try {
-      console.log(`Fetching item with id: ${id}`);
-      const response = await getItem(id);
-      console.log('Item fetched successfully:', response.data);
-      setItem(response.data);
-    } catch (error) {
-      console.error('Failed to fetch item:', error);
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      console.log(`Deleting item with id: ${id}`);
-      await deleteItem(id);
-      console.log('Item deleted successfully');
-      navigate('/items');
-    } catch (error) {
-      console.error('Failed to delete item:', error);
-    }
-  };
 
   if (!item) {
     return <div>Loading...</div>;
@@ -40,15 +21,14 @@ function ItemDetail() {
 
   return (
     <div>
-      <h2>Item Detail Component</h2>
       <h2>{item.item_name}</h2>
       <p>Description: {item.description}</p>
       <p>Quantity: {item.quantity}</p>
       <Link to={`/items/${id}/edit`}>Edit</Link>
-      <button onClick={handleDelete}>Delete</button>
+      <br />
+      <Link to="/items">Back to List</Link>
     </div>
   );
 }
 
 export default ItemDetail;
-
